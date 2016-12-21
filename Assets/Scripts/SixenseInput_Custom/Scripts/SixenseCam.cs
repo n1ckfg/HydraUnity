@@ -5,6 +5,7 @@ using UnityEngine;
 public class SixenseCam : MonoBehaviour {
 
 	public SixenseCtl sixCtl;
+	public SixenseCtl readyCtl; // R ctl goes last
 	public Transform target;
 	public Transform origin;
 	public Vector3 offset = Vector3.zero;
@@ -12,8 +13,8 @@ public class SixenseCam : MonoBehaviour {
 	public float joystickScale = 1f;
 
 	void Update() {
-		if (sixCtl.firstRun) {
-			if (sixCtl.triggerUp) {
+		if (readyCtl.firstRun) {
+			if (readyCtl.triggerUp) {
 				transform.position = target.position + offset;
 				transform.LookAt (origin);
 			}
