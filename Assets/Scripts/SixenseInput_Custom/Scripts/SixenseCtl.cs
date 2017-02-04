@@ -8,6 +8,7 @@ public class SixenseCtl : MonoBehaviour {
 	public Renderer[] ren;
 	public int ctlNum = 0;
 	public Vector3 pos = Vector3.zero;
+	public Vector3 offset = Vector3.zero;
 	public Quaternion rot = Quaternion.identity;
 
 	/*
@@ -125,6 +126,7 @@ public class SixenseCtl : MonoBehaviour {
 				
 			triggerVal = SixenseInput.Controllers[ctlNum].Trigger;
 
+			/*
 			if (triggerDown) {
 				for (int i = 0; i < ren.Length; i++) {
 					ren [i].enabled = false;
@@ -134,17 +136,30 @@ public class SixenseCtl : MonoBehaviour {
 					ren [i].enabled = true;
 				}
 			}
+			*/
 
 			joystickVal = new Vector2 (SixenseInput.Controllers[ctlNum].JoystickX, SixenseInput.Controllers[ctlNum].JoystickY);
 
 			//~
 			//Debug.Log ("pos: " + pos + "\n" + "rot: " + rot + "\n" + "trigger: " + triggerPressed);
 			//~
-			transform.position = pos;
+			transform.position = pos + offset;
 			transform.rotation = rot;
 		}
 
 		if (triggerUp && firstRun) firstRun = false;
+	}
+
+	public void showRen() {
+		for (int i = 0; i < ren.Length; i++) {
+			ren [i].enabled = true;
+		}
+	}
+
+	public void hideRen() {
+		for (int i = 0; i < ren.Length; i++) {
+			ren [i].enabled = false;
+		}
 	}
 
 }
