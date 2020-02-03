@@ -82,8 +82,9 @@ public class SixenseHandsController : MonoBehaviour
 
 
 	/** returns true if a controller is enabled and not docked */
-	bool IsControllerActive( SixenseInput.Controller controller )
+	public bool IsControllerActive( SixenseInput.Controller controller )
 	{
 		return ( controller != null && controller.Enabled && !controller.Docked );
 	}
+
 }

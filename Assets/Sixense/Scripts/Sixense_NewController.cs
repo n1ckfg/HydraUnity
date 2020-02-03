@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SixenseCtl : MonoBehaviour {
+[RequireComponent(typeof(SixenseHand))]
+public class Sixense_NewController : MonoBehaviour {
 
-	public SixenseSettings sixenseSettings;
-	public Renderer[] ren;
-	public int ctlNum = 0;
-	public Vector3 pos = Vector3.zero;
-	public Vector3 offset = Vector3.zero;
-	public Quaternion rot = Quaternion.identity;
+    public SixenseHandsController handsController;
 
 	/*
 	0. START
@@ -31,7 +27,10 @@ public class SixenseCtl : MonoBehaviour {
 	public bool joystickPressed = false;
 	public bool triggerPressed = false;
 
-	[HideInInspector] public bool startDown = false;
+    public float triggerVal = 0f;
+    public Vector2 joystickVal = Vector2.zero;
+
+    [HideInInspector] public bool startDown = false;
 	[HideInInspector] public bool button1Down = false;
 	[HideInInspector] public bool button2Down = false;
 	[HideInInspector] public bool button3Down = false;
@@ -49,13 +48,14 @@ public class SixenseCtl : MonoBehaviour {
 	[HideInInspector] public bool joystickUp = false;
 	[HideInInspector] public bool triggerUp = false;
 
-	public float triggerVal = 0f;
-	public Vector2 joystickVal = Vector2.zero;
+    private SixenseHand hand;
 
-	[HideInInspector] public bool firstRun = true;
+    private void Awake() {
+        hand = GetComponent<SixenseHand>();
+    }
 
-	void Update() {
-		/*
+    private void Update() {
+        /*
 		startDown = false;
 		button3Down = false;
 		button4Down = false;
@@ -75,17 +75,13 @@ public class SixenseCtl : MonoBehaviour {
 		triggerUp = false;
 		*/
 
-		if (SixenseInput.Controllers[ctlNum].Enabled) {
-			pos = Vector3.Scale (SixenseInput.Controllers[ctlNum].Position, new Vector3 (-sixenseSettings.scale, sixenseSettings.scale, -sixenseSettings.scale)) + sixenseSettings.offset;
-			rot = SixenseInput.Controllers[ctlNum].Rotation;
-			rot.eulerAngles = new Vector3 (-rot.eulerAngles.x, rot.eulerAngles.y, -rot.eulerAngles.z);
-			SixenseInput.Controllers[ctlNum].TriggerButtonThreshold = sixenseSettings.triggerThreshold;
-
+        if (isEnabled()) {
 			int buttonCounter = 0;
+
 			foreach (SixenseButtons button in System.Enum.GetValues(typeof(SixenseButtons))) {
-				bool press = SixenseInput.Controllers[ctlNum].GetButton(button);
-				bool pressDown = SixenseInput.Controllers[ctlNum].GetButtonDown(button);
-				bool pressUp = SixenseInput.Controllers[ctlNum].GetButtonUp(button);
+				bool press = hand.m_controller.GetButton(button);
+				bool pressDown = hand.m_controller.GetButtonDown(button);
+				bool pressUp = hand.m_controller.GetButtonUp(button);
 
 				if (buttonCounter == 0) { // start
 					startPressed = press;
@@ -124,42 +120,14 @@ public class SixenseCtl : MonoBehaviour {
 				buttonCounter++;
 			}
 				
-			triggerVal = SixenseInput.Controllers[ctlNum].Trigger;
+			triggerVal = hand.m_controller.Trigger;
 
-			/*
-			if (triggerDown) {
-				for (int i = 0; i < ren.Length; i++) {
-					ren [i].enabled = false;
-				}
-			} else if (triggerUp) {
-				for (int i = 0; i < ren.Length; i++) {
-					ren [i].enabled = true;
-				}
-			}
-			*/
-
-			joystickVal = new Vector2 (SixenseInput.Controllers[ctlNum].JoystickX, SixenseInput.Controllers[ctlNum].JoystickY);
-
-			//~
-			//Debug.Log ("pos: " + pos + "\n" + "rot: " + rot + "\n" + "trigger: " + triggerPressed);
-			//~
-			transform.position = pos + offset;
-			transform.rotation = rot;
-		}
-
-		if (triggerUp && firstRun) firstRun = false;
-	}
-
-	public void showRen() {
-		for (int i = 0; i < ren.Length; i++) {
-			ren [i].enabled = true;
+			joystickVal = new Vector2(hand.m_controller.JoystickX, hand.m_controller.JoystickY);
 		}
 	}
 
-	public void hideRen() {
-		for (int i = 0; i < ren.Length; i++) {
-			ren [i].enabled = false;
-		}
-	}
+    public bool isEnabled() {
+        return handsController.IsControllerActive(hand.m_controller);
+    }
 
 }
